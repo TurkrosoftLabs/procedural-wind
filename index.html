@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Procedural Binaural Wind</title>
+
+<meta
+    name="description"
+    content="Real-time procedural binaural wind synthesis using the Web Audio API.">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<!-- ===========================================================
+     Fullscreen interaction surface
+============================================================ -->
+
+<main id="app">
+
+    <canvas
+        id="interactionCanvas"
+        aria-label="Wind control surface">
+    </canvas>
+
+    <!-- =======================================================
+         Heads-Up Display
+    ======================================================== -->
+
+    <section id="hud">
+
+        <header>
+
+            <h1>
+                Procedural Wind
+            </h1>
+
+            <div id="status">
+
+                <span id="engineState">
+                    STOPPED
+                </span>
+
+            </div>
+
+        </header>
+
+        <section class="panel">
+
+            <h2>Wind</h2>
+
+            <div class="row">
+
+                <span>Direction</span>
+                <span id="directionValue">
+                    Front
+                </span>
+
+            </div>
+
+            <div class="row">
+
+                <span>Angle</span>
+                <span id="angleValue">
+                    0°
+                </span>
+
+            </div>
+
+            <div class="row">
+
+                <span>Intensity</span>
+                <span id="intensityValue">
+                    0.15
+                </span>
+
+            </div>
+
+            <div class="row">
+
+                <span>Speed</span>
+                <span id="speedValue">
+                    0.15
+                </span>
+
+            </div>
+
+            <div class="row">
+
+                <span>Gust</span>
+                <span id="gustValue">
+                    0.00
+                </span>
+
+            </div>
+
+        </section>
+
+        <section class="panel">
+
+            <h2>Simulation</h2>
+
+            <div class="row">
+
+                <span>Turbulence</span>
+                <span id="turbulenceValue">
+                    0
+                </span>
+
+            </div>
+
+            <div class="row">
+
+                <span>Flutter</span>
+                <span id="flutterValue">
+                    0
+                </span>
+
+            </div>
+
+            <div class="row">
+
+                <span>Pressure</span>
+                <span id="pressureValue">
+                    0
+                </span>
+
+            </div>
+
+            <div class="row">
+
+                <span>Atmosphere</span>
+                <span id="atmosphereValue">
+                    0
+                </span>
+
+            </div>
+
+        </section>
+
+        <section class="panel">
+
+            <h2>Controls</h2>
+
+            <ul>
+
+                <li>Space — Start / Stop</li>
+
+                <li>
+                    Q W E
+                    <br>
+                    A &nbsp;&nbsp;&nbsp; D
+                    <br>
+                    Z X C
+                </li>
+
+                <li>↑ ↓ — Intensity</li>
+
+                <li>Enter — Gust</li>
+
+                <li>S — Calm</li>
+
+                <li>
+                    Touch:
+                    Tap = Gust
+                    <br>
+                    Drag = Direction + Intensity
+                </li>
+
+            </ul>
+
+        </section>
+
+    </section>
+
+</main>
+
+<!-- ===========================================================
+     Modules
+============================================================ -->
+
+<script type="module">
+
+import { AudioEngine }      from "./src/AudioEngine.js";
+import { WindField }        from "./src/WindField.js";
+import { GustEngine }       from "./src/GustEngine.js";
+import { Controls }         from "./src/Controls.js";
+import { TouchControls }    from "./src/TouchControls.js";
+import { HUD }              from "./src/HUD.js";
+
+/*
+    Global application object.
+
+    This remains intentionally small.
+    All logic resides in the modules.
+*/
+
+window.windApp = {
+
+    audio: null,
+    field: null,
+    gusts: null,
+    controls: null,
+    touch: null,
+    hud: null,
+
+    async initialize()
+    {
+
+        this.audio = new AudioEngine();
+
+        await this.audio.initialize();
+
+        this.field = new WindField(
+            this.audio
+        );
+
+        this.gusts = new GustEngine(
+            this.field
+        );
+
+        this.controls = new Controls(
+            this.field,
+            this.gusts
+        );
+
+        this.touch = new TouchControls(
+            this.field,
+            this.gusts,
+            document.getElementById(
+                "interactionCanvas"
+            )
+        );
+
+        this.hud = new HUD(
+            this.field
+        );
+
+        this.hud.start();
+
+    }
+
+};
+
+window.addEventListener(
+    "load",
+    () => window.windApp.initialize()
+);
+
+</script>
+
+</body>
+</html>
