@@ -185,75 +185,7 @@
      Modules
 ============================================================ -->
 
-<script type="module">
-
-import { AudioEngine }      from "./src/AudioEngine.js";
-import { WindField }        from "./src/WindField.js";
-import { GustEngine }       from "./src/GustEngine.js";
-import { Controls }         from "./src/Controls.js";
-import { TouchControls }    from "./src/TouchControls.js";
-import { HUD }              from "./src/HUD.js";
-
-/*
-    Global application object.
-
-    This remains intentionally small.
-    All logic resides in the modules.
-*/
-
-window.windApp = {
-
-    audio: null,
-    field: null,
-    gusts: null,
-    controls: null,
-    touch: null,
-    hud: null,
-
-    async initialize()
-    {
-
-        this.audio = new AudioEngine();
-
-        await this.audio.initialize();
-
-        this.field = new WindField(
-            this.audio
-        );
-
-        this.gusts = new GustEngine(
-            this.field
-        );
-
-        this.controls = new Controls(
-            this.field,
-            this.gusts
-        );
-
-        this.touch = new TouchControls(
-            this.field,
-            this.gusts,
-            document.getElementById(
-                "interactionCanvas"
-            )
-        );
-
-        this.hud = new HUD(
-            this.field
-        );
-
-        this.hud.start();
-
-    }
-
-};
-
-window.addEventListener(
-    "load",
-    () => window.windApp.initialize()
-);
-
-</script>
+<script type="module" src="./src/main.js"></script>
 
 </body>
 </html>
